@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gym Checklist Pro - Lịch Tập 5 Buổi</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            900: '#14532d',
+                        },
+                        darkbg: '#0f172a',
+                        cardbg: '#1e293b',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0b0f19;
+            color: #f3f4f6;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
+        .checkbox-custom:checked+div {
+            background-color: #22c55e;
+            border-color: #22c55e;
+            color: #ffffff;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-brand-500 selection:text-white">
+
+    <!-- Header Navbar -->
+    <header class="sticky top-0 z-30 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div
+                    class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center text-slate-950 font-black text-xl shadow-lg shadow-brand-500/20">
+                    <i class="fa-solid font-black fa-dumbbell text-slate-950"></i>
+                </div>
+                <div>
+                    <h1
+                        class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
+                        GYM LOG <span
+                            class="text-brand-400 font-semibold text-sm px-2 py-0.5 rounded bg-brand-500/10 border border-brand-500/20">5
+                            Buổi / Tuần</span>
+                    </h1>
+                    <p class="text-xs text-slate-400 hidden sm:block">Ghi chép & Theo dõi tiến độ bài tập tự động</p>
+                </div>
+            </div>
+
+            <!-- Header Quick Actions -->
+            <div class="flex items-center space-x-2 sm:space-x-3">
+                <button onclick="openOneRmModal()"
+                    class="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-calculator text-brand-400"></i>
+                    <span class="hidden md:inline">Tính 1RM</span>
+                </button>
+                <button onclick="resetCurrentDay()"
+                    class="px-3 py-1.5 text-xs font-medium rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-rotate-right"></i>
+                    <span class="hidden sm:inline">Reset Hôm Nay</span>
+                </button>
+                <button onclick="openSettingsModal()"
+                    class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition"
+                    title="Cài đặt & Khôi phục">
+                    <i class="fa-solid fa-gear"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full">
+
+        <!-- Days Navigation Tabs -->
+        <div class="mb-6 overflow-x-auto pb-2 scrollbar-none">
+            <div class="flex gap-2 min-w-max" id="dayTabsContainer">
+                <!-- Days will be dynamically rendered here -->
+            </div>
+        </div>
+
+        <!-- Session Title & Progress Bar Banner -->
+        <div class="bg-slate-800/80 rounded-2xl p-5 border border-slate-700/60 shadow-xl mb-6 relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 opacity-5 text-slate-100 pointer-events-none">
+                <i class="fa-solid fa-person-walking-luggage text-9xl"></i>
+            </div>
+
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span id="currentDayBadge"
+                            class="text-xs font-bold px-2.5 py-1 rounded-md bg-brand-500/20 text-brand-400 border border-brand-500/30">
+                            BUỔI 1
+                        </span>
+                        <span id="currentDayTarget" class="text-xs text-slate-400 flex items-center gap-1">
+                            <i class="fa-solid fa-bullseye text-xs text-slate-500"></i> Ngực, Tay sau
+                        </span>
+                    </div>
+                    <h2 id="currentDayTitle" class="text-2xl font-bold text-white tracking-wide">
+                        Lịch Tập Ngực & Tay Sau
+                    </h2>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <button onclick="openAddExerciseModal()"
+                        class="px-4 py-2 bg-brand-500 hover:bg-brand-600 active:bg-brand-700 text-slate-950 font-bold rounded-xl transition flex items-center gap-2 shadow-lg shadow-brand-500/20 text-sm">
+                        <i class="fa-solid fa-plus text-xs"></i> Thêm Bài Tập
+                    </button>
+                    <button onclick="loadDefaultTemplateConfirm()"
+                        class="px-3.5 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-xl border border-slate-600 transition text-sm flex items-center gap-2"
+                        title="Tải bài tập mặc định gợi ý">
+                        <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i>
+                        <span class="hidden sm:inline">Mẫu Gợi Ý</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Progress Meter -->
+            <div
+                class="mt-5 pt-4 border-t border-slate-700/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="flex-grow">
+                    <div class="flex justify-between text-xs font-semibold mb-1.5">
+                        <span class="text-slate-400">Tiến độ buổi tập</span>
+                        <span id="progressText" class="text-brand-400">0% (0/0 hiệp)</span>
+                    </div>
+                    <div class="w-full h-3 bg-slate-900 rounded-full overflow-hidden p-0.5 border border-slate-700/50">
+                        <div id="progressBar"
+                            class="h-full bg-gradient-to-r from-brand-500 to-emerald-300 rounded-full transition-all duration-500"
+                            style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4 text-xs text-slate-400 shrink-0 self-end sm:self-center">
+                    <div><i class="fa-solid fa-dumbbell text-slate-500 mr-1"></i> <span id="exerciseCount">0</span> bài
+                        tập</div>
+                    <div><i class="fa-solid fa-check-double text-slate-500 mr-1"></i> <span
+                            id="completedSetsCount">0</span> hiệp xong</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Exercise List Container -->
+        <div id="exerciseList" class="space-y-4">
+            <!-- Dynamic Exercise Cards populated via JavaScript -->
+        </div>
+
+        <!-- Empty State UI (Shown when no exercises exist) -->
+        <div id="emptyState"
+            class="hidden text-center py-12 px-4 rounded-2xl bg-slate-800/40 border border-dashed border-slate-700/80">
+            <div
+                class="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-500 text-2xl border border-slate-700">
+                <i class="fa-solid fa-clipboard-list"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-300 mb-1">Chưa có bài tập nào cho buổi này</h3>
+            <p class="text-slate-400 text-sm max-w-md mx-auto mb-5">Bạn có thể tự thêm bài tập cá nhân hoặc nhấn nút bên
+                dưới để tải khung bài tập chuẩn gợi ý cho ngày hôm nay.</p>
+            <div class="flex justify-center gap-3">
+                <button onclick="openAddExerciseModal()"
+                    class="px-4 py-2 bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold rounded-xl transition text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-plus"></i> Thêm bài tập
+                </button>
+                <button onclick="loadDefaultTemplateConfirm()"
+                    class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-xl transition text-sm flex items-center gap-2 border border-slate-600">
+                    <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i> Dùng mẫu có sẵn
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Floating Rest Timer Bar -->
+    <div id="timerWidget"
+        class="fixed bottom-4 right-4 z-40 bg-slate-900/95 backdrop-blur-md border border-slate-700 p-3 rounded-2xl shadow-2xl flex items-center gap-3 transition-all transform translate-y-0 max-w-xs sm:max-w-sm">
+        <div
+            class="w-10 h-10 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-400 shrink-0">
+            <i class="fa-solid fa-stopwatch text-lg" id="timerIcon"></i>
+        </div>
+        <div class="flex-grow min-w-0">
+            <div class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Đồng Hồ Nghỉ</div>
+            <div class="text-xl font-black tracking-mono text-white font-mono" id="timerDisplay">00:00</div>
+        </div>
+        <div class="flex items-center gap-1">
+            <button id="timerToggleBtn" onclick="toggleTimer()"
+                class="p-2 rounded-lg bg-brand-500 text-slate-950 hover:bg-brand-400 transition font-bold"
+                title="Bắt đầu / Tạm dừng">
+                <i class="fa-solid fa-play" id="timerToggleIcon"></i>
+            </button>
+            <button onclick="resetTimer()"
+                class="p-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 transition" title="Đặt lại">
+                <i class="fa-solid fa-rotate-left"></i>
+            </button>
+            <button onclick="openTimerQuickSelect()"
+                class="p-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 transition" title="Chọn thời gian">
+                <i class="fa-solid fa-sliders"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-12 bg-slate-900 border-t border-slate-800 py-6 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto px-4">
+            <p>Gym Checklist Pro • Thiết lập lịch tập & Tự động lưu tiến trình</p>
+            <p class="mt-1 text-slate-600">Dữ liệu được lưu trữ an toàn ngay trên trình duyệt của bạn.</p>
+        </div>
+    </footer>
+
+    <!-- Modal: Add / Edit Exercise -->
+    <div id="exerciseModal"
+        class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div
+            class="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl transform transition-all">
+            <div class="px-6 py-4 border-b border-slate-700 flex justify-between items-center bg-slate-800/80">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2" id="modalTitle">
+                    <i class="fa-solid fa-pen-to-square text-brand-400"></i> Thêm Bài Tập Mới
+                </h3>
+                <button onclick="closeExerciseModal()" class="text-slate-400 hover:text-white transition p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <form id="exerciseForm" onsubmit="handleSaveExercise(event)" class="p-6 space-y-4">
+                <input type="hidden" id="editExerciseId" value="">
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Tên bài tập <span
+                            class="text-red-400">*</span></label>
+                    <input type="text" id="inputExName" required placeholder="Ví dụ: Đẩy ngực ngang (Bench Press)"
+                        class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500 transition">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Nhóm cơ chính</label>
+                        <select id="inputExCategory"
+                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500 transition">
+                            <option value="Ngực">Ngực</option>
+                            <option value="Vai">Vai</option>
+                            <option value="Lưng">Lưng / Xô</option>
+                            <option value="Tay trước">Tay trước (Biceps)</option>
+                            <option value="Tay sau">Tay sau (Triceps)</option>
+                            <option value="Chân">Chân / Đùi</option>
+                            <option value="Bụng">Bụng</option>
+                            <option value="Toàn thân">Khác</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Số Hiệp (Sets)</label>
+                        <input type="number" id="inputExSets" min="1" max="10" value="4" required
+                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500 transition">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Mức tạ mặc định
+                            (Kg)</label>
+                        <input type="number" id="inputExWeight" step="0.5" min="0" placeholder="VD: 50"
+                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500 transition">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Số Lần (Reps)</label>
+                        <input type="number" id="inputExReps" min="1" max="100" placeholder="VD: 10"
+                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500 transition">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Ghi chú thêm (Nếu
+                        có)</label>
+                    <input type="text" id="inputExNote" placeholder="VD: Hạ tạ chậm 2s, xiết cơ ở đỉnh"
+                        class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500 transition">
+                </div>
+
+                <div class="pt-4 border-t border-slate-700 flex justify-end gap-3">
+                    <button type="button" onclick="closeExerciseModal()"
+                        class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 text-sm font-medium rounded-xl transition">Hủy</button>
+                    <button type="submit"
+                        class="px-5 py-2 bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold text-sm rounded-xl transition shadow-lg shadow-brand-500/20">Lưu
+                        Bài Tập</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: 1RM Calculator -->
+    <div id="oneRmModal"
+        class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
+            <div class="px-6 py-4 border-b border-slate-700 flex justify-between items-center bg-slate-800/80">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-calculator text-brand-400"></i> Tính 1RM (Sức Nâng Tối Đa)
+                </h3>
+                <button onclick="closeOneRmModal()" class="text-slate-400 hover:text-white transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <p class="text-xs text-slate-400">Tính toán sức nâng 1 lần tối đa dựa theo công thức Brzycki chuẩn.</p>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Mức tạ (Kg)</label>
+                        <input type="number" id="rmWeight" placeholder="80" oninput="calculateOneRm()"
+                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-brand-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Số lần lặp
+                            (Reps)</label>
+                        <input type="number" id="rmReps" placeholder="8" oninput="calculateOneRm()"
+                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-brand-500">
+                    </div>
+                </div>
+
+                <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700 text-center">
+                    <div class="text-xs text-slate-400 uppercase font-semibold">Ước Tính 1RM Của Bạn</div>
+                    <div id="rmResult" class="text-3xl font-black text-brand-400 mt-1">0 Kg</div>
+                </div>
+
+                <div class="space-y-1.5 text-xs text-slate-400">
+                    <div class="flex justify-between py-1 border-b border-slate-800"><span>95% 1RM (Xây dựng sức
+                            mạnh):</span> <span id="rm95" class="font-bold text-slate-200">0 kg</span></div>
+                    <div class="flex justify-between py-1 border-b border-slate-800"><span>85% 1RM (Tăng cơ bắp -
+                            Hypertrophy):</span> <span id="rm85" class="font-bold text-slate-200">0 kg</span></div>
+                    <div class="flex justify-between py-1"><span>70% 1RM (Sức bền cơ bắp):</span> <span id="rm70"
+                            class="font-bold text-slate-200">0 kg</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Timer Quick Select -->
+    <div id="timerModal"
+        class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div
+            class="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-xs overflow-hidden shadow-2xl p-5 text-center">
+            <h3 class="text-base font-bold text-white mb-3 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-stopwatch text-brand-400"></i> Thời Gian Nghỉ Hiệp
+            </h3>
+            <div class="grid grid-cols-2 gap-2 mb-4">
+                <button onclick="setRestTimer(30)"
+                    class="py-2.5 bg-slate-700 hover:bg-brand-500 hover:text-slate-950 font-bold text-sm text-slate-200 rounded-xl transition">30
+                    Giây</button>
+                <button onclick="setRestTimer(60)"
+                    class="py-2.5 bg-slate-700 hover:bg-brand-500 hover:text-slate-950 font-bold text-sm text-slate-200 rounded-xl transition">60
+                    Giây</button>
+                <button onclick="setRestTimer(90)"
+                    class="py-2.5 bg-slate-700 hover:bg-brand-500 hover:text-slate-950 font-bold text-sm text-slate-200 rounded-xl transition">90
+                    Giây</button>
+                <button onclick="setRestTimer(120)"
+                    class="py-2.5 bg-slate-700 hover:bg-brand-500 hover:text-slate-950 font-bold text-sm text-slate-200 rounded-xl transition">120
+                    Giây</button>
+            </div>
+            <button onclick="closeTimerModal()"
+                class="w-full py-2 bg-slate-900 text-slate-400 text-xs font-medium rounded-lg hover:text-white transition">Đóng</button>
+        </div>
+    </div>
+
+    <!-- Modal: Settings & Data Management -->
+    <div id="settingsModal"
+        class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
+            <div class="px-6 py-4 border-b border-slate-700 flex justify-between items-center bg-slate-800/80">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-brand-400"></i> Quản Lý Dữ Liệu
+                </h3>
+                <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-white transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <h4 class="text-sm font-semibold text-slate-200 mb-1">Khôi phục Lịch Mặc Định</h4>
+                    <p class="text-xs text-slate-400 mb-3">Tải lại toàn bộ khung 5 buổi tập gợi ý tiêu chuẩn (sẽ ghi đè
+                        các bài hiện tại).</p>
+                    <button onclick="resetAllToDefault()"
+                        class="w-full py-2 bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold text-xs rounded-xl hover:bg-amber-500/30 transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-arrow-rotate-left"></i> Khôi phục lịch 5 buổi ban đầu
+                    </button>
+                </div>
+
+                <div class="pt-3 border-t border-slate-700">
+                    <h4 class="text-sm font-semibold text-slate-200 mb-1">Xóa Sạch Dữ Liệu</h4>
+                    <p class="text-xs text-slate-400 mb-3">Xóa toàn bộ bài tập và thiết lập cá nhân trên trình duyệt.
+                    </p>
+                    <button onclick="clearAllData()"
+                        class="w-full py-2 bg-red-500/20 text-red-300 border border-red-500/30 font-bold text-xs rounded-xl hover:bg-red-500/30 transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-trash"></i> Xóa tất cả dữ liệu
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Default Gym Routine Data based on User Request (5 Days per Week)
+        const DEFAULT_ROUTINE = [
+            {
+                id: 'day1',
+                dayNumber: 1,
+                name: 'Buổi 1',
+                title: 'Ngực & Tay Sau',
+                target: 'Ngực, Tay sau',
+                exercises: [
+                    {
+                        id: 'ex_1_1',
+                        name: 'Đẩy ngực ngang (Bench Press)',
+                        category: 'Ngực',
+                        setsCount: 4,
+                        defaultWeight: 50,
+                        defaultReps: 10,
+                        note: 'Gồng xô, mở ngực, hạ tạ kiểm soát',
+                        setsState: [{ weight: 50, reps: 10, completed: false }, { weight: 50, reps: 10, completed: false }, { weight: 50, reps: 10, completed: false }, { weight: 50, reps: 10, completed: false }]
+                    },
+                    {
+                        id: 'ex_1_2',
+                        name: 'Đẩy ngực trên tạ đơn (Incline Dumbbell Press)',
+                        category: 'Ngực',
+                        setsCount: 3,
+                        defaultWeight: 18,
+                        defaultReps: 12,
+                        note: 'Ghế nghiêng 30-45 độ',
+                        setsState: [{ weight: 18, reps: 12, completed: false }, { weight: 18, reps: 12, completed: false }, { weight: 18, reps: 12, completed: false }]
+                    },
+                    {
+                        id: 'ex_1_3',
+                        name: 'Ép ngực dây cáp (Cable Fly)',
+                        category: 'Ngực',
+                        setsCount: 3,
+                        defaultWeight: 15,
+                        defaultReps: 15,
+                        note: 'Gồng ngực ở điểm ép tối đa',
+                        setsState: [{ weight: 15, reps: 15, completed: false }, { weight: 15, reps: 15, completed: false }, { weight: 15, reps: 15, completed: false }]
+                    },
+                    {
+                        id: 'ex_1_4',
+                        name: 'Kéo tay sau cáp (Tricep Pushdown)',
+                        category: 'Tay sau',
+                        setsCount: 4,
+                        defaultWeight: 25,
+                        defaultReps: 12,
+                        note: 'Khóa cùi chỏ cố định sát thân',
+                        setsState: [{ weight: 25, reps: 12, completed: false }, { weight: 25, reps: 12, completed: false }, { weight: 25, reps: 12, completed: false }, { weight: 25, reps: 12, completed: false }]
+                    },
+                    {
+                        id: 'ex_1_5',
+                        name: 'Đẩy tay sau qua đầu (Overhead Tricep Extension)',
+                        category: 'Tay sau',
+                        setsCount: 3,
+                        defaultWeight: 14,
+                        defaultReps: 12,
+                        note: 'Giữ cùi chỏ không mở quá rộng',
+                        setsState: [{ weight: 14, reps: 12, completed: false }, { weight: 14, reps: 12, completed: false }, { weight: 14, reps: 12, completed: false }]
+                    }
+                ]
+            },
+            {
+                id: 'day2',
+                dayNumber: 2,
+                name: 'Buổi 2',
+                title: 'Vai & Tay Trước',
+                target: 'Vai, Tay trước',
+                exercises: [
+                    {
+                        id: 'ex_2_1',
+                        name: 'Đẩy vai tạ đòn (Overhead Barbell Press)',
+                        category: 'Vai',
+                        setsCount: 4,
+                        defaultWeight: 35,
+                        defaultReps: 8,
+                        note: 'Gồng bụng chắc chắn',
+                        setsState: [{ weight: 35, reps: 8, completed: false }, { weight: 35, reps: 8, completed: false }, { weight: 35, reps: 8, completed: false }, { weight: 35, reps: 8, completed: false }]
+                    },
+                    {
+                        id: 'ex_2_2',
+                        name: 'Dang vai tạ đơn (Dumbbell Lateral Raise)',
+                        category: 'Vai',
+                        setsCount: 4,
+                        defaultWeight: 8,
+                        defaultReps: 15,
+                        note: 'Dùng vai trung tâm kéo tạ',
+                        setsState: [{ weight: 8, reps: 15, completed: false }, { weight: 8, reps: 15, completed: false }, { weight: 8, reps: 15, completed: false }, { weight: 8, reps: 15, completed: false }]
+                    },
+                    {
+                        id: 'ex_2_3',
+                        name: 'Kéo dây vai sau (Face Pull)',
+                        category: 'Vai',
+                        setsCount: 3,
+                        defaultWeight: 20,
+                        defaultReps: 15,
+                        note: 'Kéo về phía trán, xoay vai ngoài',
+                        setsState: [{ weight: 20, reps: 15, completed: false }, { weight: 20, reps: 15, completed: false }, { weight: 20, reps: 15, completed: false }]
+                    },
+                    {
+                        id: 'ex_2_4',
+                        name: 'Cuốn tay trước tạ đòn (Barbell Curl)',
+                        category: 'Tay trước',
+                        setsCount: 4,
+                        defaultWeight: 20,
+                        defaultReps: 10,
+                        note: 'Không dùng đà lưng',
+                        setsState: [{ weight: 20, reps: 10, completed: false }, { weight: 20, reps: 10, completed: false }, { weight: 20, reps: 10, completed: false }, { weight: 20, reps: 10, completed: false }]
+                    },
+                    {
+                        id: 'ex_2_5',
+                        name: 'Cuốn búa tạ đơn (Hammer Curl)',
+                        category: 'Tay trước',
+                        setsCount: 3,
+                        defaultWeight: 10,
+                        defaultReps: 12,
+                        note: 'Tập trung tay cẳng và nhị đầu',
+                        setsState: [{ weight: 10, reps: 12, completed: false }, { weight: 10, reps: 12, completed: false }, { weight: 10, reps: 12, completed: false }]
+                    }
+                ]
+            },
+            {
+                id: 'day3',
+                dayNumber: 3,
+                name: 'Buổi 3',
+                title: 'Lưng & Tay',
+                target: 'Lưng, Tay',
+                exercises: [
+                    {
+                        id: 'ex_3_1',
+                        name: 'Kéo xô cáp (Lat Pulldown)',
+                        category: 'Lưng',
+                        setsCount: 4,
+                        defaultWeight: 45,
+                        defaultReps: 10,
+                        note: 'Kéo về ngực trên, ưỡn ngực',
+                        setsState: [{ weight: 45, reps: 10, completed: false }, { weight: 45, reps: 10, completed: false }, { weight: 45, reps: 10, completed: false }, { weight: 45, reps: 10, completed: false }]
+                    },
+                    {
+                        id: 'ex_3_2',
+                        name: 'Chèo tạ đòn lưng (Bent Over Barbell Row)',
+                        category: 'Lưng',
+                        setsCount: 4,
+                        defaultWeight: 40,
+                        defaultReps: 10,
+                        note: 'Cúi lưng thẳng 45 độ, kéo tạ vào rốn',
+                        setsState: [{ weight: 40, reps: 10, completed: false }, { weight: 40, reps: 10, completed: false }, { weight: 40, reps: 10, completed: false }, { weight: 40, reps: 10, completed: false }]
+                    },
+                    {
+                        id: 'ex_3_3',
+                        name: 'Kéo cáp ngồi (Seated Cable Row)',
+                        category: 'Lưng',
+                        setsCount: 3,
+                        defaultWeight: 40,
+                        defaultReps: 12,
+                        note: 'Xiết chặt cơ bả vai',
+                        setsState: [{ weight: 40, reps: 12, completed: false }, { weight: 40, reps: 12, completed: false }, { weight: 40, reps: 12, completed: false }]
+                    },
+                    {
+                        id: 'ex_3_4',
+                        name: 'Cuốn tay trước tạ đơn nghiêng (Incline DB Curl)',
+                        category: 'Tay trước',
+                        setsCount: 3,
+                        defaultWeight: 8,
+                        defaultReps: 12,
+                        note: 'Căng nhị đầu tối đa',
+                        setsState: [{ weight: 8, reps: 12, completed: false }, { weight: 8, reps: 12, completed: false }, { weight: 8, reps: 12, completed: false }]
+                    },
+                    {
+                        id: 'ex_3_5',
+                        name: 'Gập cổ tay cẳng tay (Wrist Curl)',
+                        category: 'Tay',
+                        setsCount: 3,
+                        defaultWeight: 15,
+                        defaultReps: 15,
+                        note: 'Tăng sức mạnh cẳng tay',
+                        setsState: [{ weight: 15, reps: 15, completed: false }, { weight: 15, reps: 15, completed: false }, { weight: 15, reps: 15, completed: false }]
+                    }
+                ]
+            },
+            {
+                id: 'day4',
+                dayNumber: 4,
+                name: 'Buổi 4',
+                title: 'Chân & Bụng',
+                target: 'Chân, Bụng',
+                exercises: [
+                    {
+                        id: 'ex_4_1',
+                        name: 'Gánh tạ (Barbell Squat)',
+                        category: 'Chân',
+                        setsCount: 4,
+                        defaultWeight: 60,
+                        defaultReps: 8,
+                        note: 'Xuống sâu đùi song song mặt đất',
+                        setsState: [{ weight: 60, reps: 8, completed: false }, { weight: 60, reps: 8, completed: false }, { weight: 60, reps: 8, completed: false }, { weight: 60, reps: 8, completed: false }]
+                    },
+                    {
+                        id: 'ex_4_2',
+                        name: 'Đạp đùi máy (Leg Press)',
+                        category: 'Chân',
+                        setsCount: 3,
+                        defaultWeight: 100,
+                        defaultReps: 12,
+                        note: 'Không khóa khớp gối',
+                        setsState: [{ weight: 100, reps: 12, completed: false }, { weight: 100, reps: 12, completed: false }, { weight: 100, reps: 12, completed: false }]
+                    },
+                    {
+                        id: 'ex_4_3',
+                        name: 'Móc đùi sau (Lying Leg Curl)',
+                        category: 'Chân',
+                        setsCount: 4,
+                        defaultWeight: 30,
+                        defaultReps: 12,
+                        note: 'Tập trung cơ gân kheo',
+                        setsState: [{ weight: 30, reps: 12, completed: false }, { weight: 30, reps: 12, completed: false }, { weight: 30, reps: 12, completed: false }, { weight: 30, reps: 12, completed: false }]
+                    },
+                    {
+                        id: 'ex_4_4',
+                        name: 'Nhón bắp chân (Calf Raise)',
+                        category: 'Chân',
+                        setsCount: 4,
+                        defaultWeight: 40,
+                        defaultReps: 15,
+                        note: 'Giữ 1s ở vị trí cao nhất',
+                        setsState: [{ weight: 40, reps: 15, completed: false }, { weight: 40, reps: 15, completed: false }, { weight: 40, reps: 15, completed: false }, { weight: 40, reps: 15, completed: false }]
+                    },
+                    {
+                        id: 'ex_4_5',
+                        name: 'Gập bụng trên ghế dốc (Decline Crunch)',
+                        category: 'Bụng',
+                        setsCount: 3,
+                        defaultWeight: 0,
+                        defaultReps: 20,
+                        note: 'Gập cuộn bụng, không dùng cơ cổ',
+                        setsState: [{ weight: 0, reps: 20, completed: false }, { weight: 0, reps: 20, completed: false }, { weight: 0, reps: 20, completed: false }]
+                    }
+                ]
+            },
+            {
+                id: 'day5',
+                dayNumber: 5,
+                name: 'Buổi 5',
+                title: 'Tay Trước & Tay Sau',
+                target: 'Tay trước, Tay sau',
+                exercises: [
+                    {
+                        id: 'ex_5_1',
+                        name: 'Cuốn tay trước đòn EZ (EZ-Bar Curl)',
+                        category: 'Tay trước',
+                        setsCount: 4,
+                        defaultWeight: 20,
+                        defaultReps: 10,
+                        note: 'Xoay cổ tay tự nhiên với thanh EZ',
+                        setsState: [{ weight: 20, reps: 10, completed: false }, { weight: 20, reps: 10, completed: false }, { weight: 20, reps: 10, completed: false }, { weight: 20, reps: 10, completed: false }]
+                    },
+                    {
+                        id: 'ex_5_2',
+                        name: 'Nằm duỗi tay sau tạ đòn (Skull Crusher)',
+                        category: 'Tay sau',
+                        setsCount: 4,
+                        defaultWeight: 20,
+                        defaultReps: 10,
+                        note: 'Hạ tạ sát trán có kiểm soát',
+                        setsState: [{ weight: 20, reps: 10, completed: false }, { weight: 20, reps: 10, completed: false }, { weight: 20, reps: 10, completed: false }, { weight: 20, reps: 10, completed: false }]
+                    },
+                    {
+                        id: 'ex_5_3',
+                        name: 'Cuốn tay trước ghế Preacher (Preacher Curl)',
+                        category: 'Tay trước',
+                        setsCount: 3,
+                        defaultWeight: 15,
+                        defaultReps: 12,
+                        note: 'Cố định bắp tay trên đệm',
+                        setsState: [{ weight: 15, reps: 12, completed: false }, { weight: 15, reps: 12, completed: false }, { weight: 15, reps: 12, completed: false }]
+                    },
+                    {
+                        id: 'ex_5_4',
+                        name: 'Chống xà kép tay sau (Tricep Dips)',
+                        category: 'Tay sau',
+                        setsCount: 3,
+                        defaultWeight: 0,
+                        defaultReps: 12,
+                        note: 'Thân người thẳng để dồn lực vào tay sau',
+                        setsState: [{ weight: 0, reps: 12, completed: false }, { weight: 0, reps: 12, completed: false }, { weight: 0, reps: 12, completed: false }]
+                    },
+                    {
+                        id: 'ex_5_5',
+                        name: 'Kéo dây thừng tay sau (Rope Pushdown)',
+                        category: 'Tay sau',
+                        setsCount: 3,
+                        defaultWeight: 20,
+                        defaultReps: 15,
+                        note: 'Tách 2 đầu dây ở cuối biên độ',
+                        setsState: [{ weight: 20, reps: 15, completed: false }, { weight: 20, reps: 15, completed: false }, { weight: 20, reps: 15, completed: false }]
+                    }
+                ]
+            }
+        ];
+
+        // State Variables
+        const STORAGE_KEY = 'gym_checklist_pro_routine_v2';
+        let currentDayIndex = 0;
+        let workoutRoutine = [];
+
+        // Timer Variables
+        let timerSeconds = 60;
+        let timerTotalSeconds = 60;
+        let timerInterval = null;
+        let isTimerRunning = false;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadRoutineFromStorage();
+            renderDayTabs();
+            renderCurrentDayContent();
+            setupAudioContext();
+        });
+
+        // Load data from localStorage or fallback to DEFAULT_ROUTINE
+        function loadRoutineFromStorage() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try {
+                    workoutRoutine = JSON.parse(saved);
+                } catch (e) {
+                    console.error('Lỗi đọc dữ liệu localStorage:', e);
+                    workoutRoutine = JSON.parse(JSON.stringify(DEFAULT_ROUTINE));
+                }
+            } else {
+                workoutRoutine = JSON.parse(JSON.stringify(DEFAULT_ROUTINE));
+                saveRoutineToStorage();
+            }
+        }
+
+        // Save current routine state to localStorage
+        function saveRoutineToStorage() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(workoutRoutine));
+            updateProgressBar();
+        }
+
+        // Render Day Tab Buttons
+        function renderDayTabs() {
+            const container = document.getElementById('dayTabsContainer');
+            container.innerHTML = '';
+
+            workoutRoutine.forEach((day, index) => {
+                const isActive = index === currentDayIndex;
+
+                // Calculate completion
+                let totalSets = 0;
+                let doneSets = 0;
+                day.exercises.forEach(ex => {
+                    ex.setsState.forEach(s => {
+                        totalSets++;
+                        if (s.completed) doneSets++;
+                    });
+                });
+                const isDayComplete = totalSets > 0 && doneSets === totalSets;
+
+                const btn = document.createElement('button');
+                btn.onclick = () => switchDay(index);
+                btn.className = `flex flex-col items-start px-4 py-3 rounded-xl border transition-all text-left min-w-[130px] sm:min-w-[150px] relative ${isActive
+                        ? 'bg-brand-500 text-slate-950 border-brand-400 font-bold shadow-lg shadow-brand-500/20'
+                        : 'bg-slate-800/80 hover:bg-slate-700 text-slate-300 border-slate-700'
+                    }`;
+
+                btn.innerHTML = `
+                    <div class="flex items-center justify-between w-full mb-1">
+                        <span class="text-xs font-black uppercase ${isActive ? 'text-slate-900' : 'text-slate-400'}">${day.name}</span>
+                        ${isDayComplete ? `<i class="fa-solid fa-circle-check ${isActive ? 'text-slate-950' : 'text-brand-400'} text-xs"></i>` : ''}
+                    </div>
+                    <span class="text-sm font-bold truncate w-full ${isActive ? 'text-slate-950' : 'text-white'}">${day.target}</span>
+                    <span class="text-[10px] mt-1 ${isActive ? 'text-slate-800' : 'text-slate-400'}">${doneSets}/${totalSets} Hiệp</span>
+                `;
+
+                container.appendChild(btn);
+            });
+        }
+
+        // Switch active day
+        function switchDay(index) {
+            currentDayIndex = index;
+            renderDayTabs();
+            renderCurrentDayContent();
+        }
+
+        // Render current selected day details & exercise checklist
+        function renderCurrentDayContent() {
+            const currentDay = workoutRoutine[currentDayIndex];
+
+            // Set Header information
+            document.getElementById('currentDayBadge').innerText = currentDay.name;
+            document.getElementById('currentDayTitle').innerText = `${currentDay.name}: ${currentDay.title}`;
+            document.getElementById('currentDayTarget').innerHTML = `<i class="fa-solid fa-bullseye text-xs text-brand-400"></i> Tập: ${currentDay.target}`;
+
+            const listContainer = document.getElementById('exerciseList');
+            const emptyState = document.getElementById('emptyState');
+            listContainer.innerHTML = '';
+
+            if (!currentDay.exercises || currentDay.exercises.length === 0) {
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                currentDay.exercises.forEach((ex, exIndex) => {
+                    listContainer.appendChild(createExerciseCard(ex, exIndex));
+                });
+            }
+
+            updateProgressBar();
+        }
+
+        // Create HTML DOM Card for an Exercise
+        function createExerciseCard(ex, exIndex) {
+            const card = document.createElement('div');
+            card.className = 'bg-slate-800/90 rounded-2xl border border-slate-700/80 overflow-hidden shadow-lg transition hover:border-slate-600';
+
+            // Check if all sets completed
+            const allDone = ex.setsState.length > 0 && ex.setsState.every(s => s.completed);
+
+            let setsRowsHtml = ex.setsState.map((set, setIdx) => `
+                <div class="flex items-center justify-between py-2.5 px-3 rounded-xl ${set.completed ? 'bg-brand-500/10 border border-brand-500/30' : 'bg-slate-900/60 border border-slate-800'} transition">
+                    <div class="flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-bold text-slate-300">
+                            ${setIdx + 1}
+                        </span>
+                        <span class="text-xs font-medium text-slate-400 hidden sm:inline">Hiệp ${setIdx + 1}</span>
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-1.5">
+                            <input type="number" step="0.5" min="0" value="${set.weight}" onchange="updateSetData(${exIndex}, ${setIdx}, 'weight', this.value)" 
+                                class="w-16 bg-slate-800 border border-slate-700 rounded-lg px-2 py-1 text-xs text-center font-bold text-white focus:outline-none focus:border-brand-500">
+                            <span class="text-[11px] text-slate-400 font-semibold">kg</span>
+                        </div>
+
+                        <div class="flex items-center gap-1.5">
+                            <input type="number" min="1" max="100" value="${set.reps}" onchange="updateSetData(${exIndex}, ${setIdx}, 'reps', this.value)" 
+                                class="w-14 bg-slate-800 border border-slate-700 rounded-lg px-2 py-1 text-xs text-center font-bold text-white focus:outline-none focus:border-brand-500">
+                            <span class="text-[11px] text-slate-400 font-semibold">lần</span>
+                        </div>
+
+                        <!-- Checkbox Button -->
+                        <label class="relative inline-flex items-center cursor-pointer ml-1">
+                            <input type="checkbox" ${set.completed ? 'checked' : ''} onchange="toggleSetCheck(${exIndex}, ${setIdx}, this.checked)" class="sr-only checkbox-custom">
+                            <div class="w-8 h-8 rounded-xl border border-slate-600 bg-slate-800 hover:border-brand-400 flex items-center justify-center transition-all duration-200">
+                                <i class="fa-solid fa-check text-xs"></i>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            `).join('');
+
+            card.innerHTML = `
+                <div class="p-4 sm:p-5">
+                    <!-- Exercise Header -->
+                    <div class="flex items-start justify-between gap-3 mb-3">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="text-[10px] uppercase font-extrabold px-2 py-0.5 rounded bg-slate-700 text-slate-300">
+                                    ${ex.category || 'Tập Luyện'}
+                                </span>
+                                ${allDone ? '<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-brand-500/20 text-brand-400 border border-brand-500/30 flex items-center gap-1"><i class="fa-solid fa-check"></i> Hoàn thành</span>' : ''}
+                            </div>
+                            <h3 class="text-base sm:text-lg font-bold text-white ${allDone ? 'line-through opacity-80' : ''}">${ex.name}</h3>
+                            ${ex.note ? `<p class="text-xs text-slate-400 mt-0.5 flex items-center gap-1"><i class="fa-regular fa-note-sticky text-brand-400"></i> ${ex.note}</p>` : ''}
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex items-center gap-1 shrink-0">
+                            <button onclick="openEditExerciseModal(${exIndex})" class="p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg transition" title="Chỉnh sửa">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button onclick="deleteExercise(${exIndex})" class="p-2 text-slate-400 hover:text-red-400 hover:bg-slate-700 rounded-lg transition" title="Xóa bài tập">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sets List Grid -->
+                    <div class="space-y-2 mt-4">
+                        ${setsRowsHtml}
+                    </div>
+
+                    <!-- Add extra set button -->
+                    <div class="mt-3 flex justify-between items-center text-xs">
+                        <button onclick="addSetToExercise(${exIndex})" class="text-brand-400 hover:text-brand-300 font-semibold flex items-center gap-1">
+                            <i class="fa-solid fa-plus text-[10px]"></i> Thêm 1 Hiệp
+                        </button>
+                        ${ex.setsState.length > 1 ? `
+                            <button onclick="removeLastSetFromExercise(${exIndex})" class="text-slate-500 hover:text-red-400 transition">
+                                Xóa hiệp cuối
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+
+            return card;
+        }
+
+        // Toggle set completion check
+        function toggleSetCheck(exIndex, setIdx, isChecked) {
+            workoutRoutine[currentDayIndex].exercises[exIndex].setsState[setIdx].completed = isChecked;
+            saveRoutineToStorage();
+            renderDayTabs();
+
+            // Trigger rest timer on set completion
+            if (isChecked) {
+                startRestTimerAuto();
+                playBeepSound();
+                checkIfAllDayCompleted();
+            }
+
+            // Re-render current day UI to update styles smoothly
+            renderCurrentDayContent();
+        }
+
+        // Check if all exercises for today are completed & show confetti
+        function checkIfAllDayCompleted() {
+            const day = workoutRoutine[currentDayIndex];
+            let total = 0;
+            let done = 0;
+            day.exercises.forEach(ex => {
+                ex.setsState.forEach(s => {
+                    total++;
+                    if (s.completed) done++;
+                });
+            });
+
+            if (total > 0 && done === total) {
+                if (typeof confetti === 'function') {
+                    confetti({
+                        particleCount: 100,
+                        spread: 70,
+                        origin: { y: 0.6 }
+                    });
+                }
+            }
+        }
+
+        // Update single set's weight or reps input
+        function updateSetData(exIndex, setIdx, field, value) {
+            const numVal = parseFloat(value) || 0;
+            workoutRoutine[currentDayIndex].exercises[exIndex].setsState[setIdx][field] = numVal;
+            saveRoutineToStorage();
+        }
+
+        // Add 1 extra set to exercise
+        function addSetToExercise(exIndex) {
+            const ex = workoutRoutine[currentDayIndex].exercises[exIndex];
+            const lastSet = ex.setsState[ex.setsState.length - 1] || { weight: ex.defaultWeight || 0, reps: ex.defaultReps || 10 };
+            ex.setsState.push({
+                weight: lastSet.weight,
+                reps: lastSet.reps,
+                completed: false
+            });
+            ex.setsCount = ex.setsState.length;
+            saveRoutineToStorage();
+            renderCurrentDayContent();
+            renderDayTabs();
+        }
+
+        // Remove last set from exercise
+        function removeLastSetFromExercise(exIndex) {
+            const ex = workoutRoutine[currentDayIndex].exercises[exIndex];
+            if (ex.setsState.length > 1) {
+                ex.setsState.pop();
+                ex.setsCount = ex.setsState.length;
+                saveRoutineToStorage();
+                renderCurrentDayContent();
+                renderDayTabs();
+            }
+        }
+
+        // Delete Exercise
+        function deleteExercise(exIndex) {
+            if (confirm('Bạn có chắc chắn muốn xóa bài tập này?')) {
+                workoutRoutine[currentDayIndex].exercises.splice(exIndex, 1);
+                saveRoutineToStorage();
+                renderCurrentDayContent();
+                renderDayTabs();
+            }
+        }
+
+        // Update Progress Bar
+        function updateProgressBar() {
+            const currentDay = workoutRoutine[currentDayIndex];
+            let totalSets = 0;
+            let completedSets = 0;
+
+            if (currentDay && currentDay.exercises) {
+                currentDay.exercises.forEach(ex => {
+                    ex.setsState.forEach(set => {
+                        totalSets++;
+                        if (set.completed) completedSets++;
+                    });
+                });
+            }
+
+            const percent = totalSets > 0 ? Math.round((completedSets / totalSets) * 100) : 0;
+
+            document.getElementById('progressBar').style.width = `${percent}%`;
+            document.getElementById('progressText').innerText = `${percent}% (${completedSets}/${totalSets} hiệp)`;
+            document.getElementById('exerciseCount').innerText = currentDay ? currentDay.exercises.length : 0;
+            document.getElementById('completedSetsCount').innerText = completedSets;
+        }
+
+        // Modal Handlers
+        function openAddExerciseModal() {
+            document.getElementById('editExerciseId').value = '';
+            document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-plus text-brand-400"></i> Thêm Bài Tập Mới';
+            document.getElementById('exerciseForm').reset();
+            document.getElementById('inputExSets').value = '4';
+            document.getElementById('exerciseModal').classList.remove('hidden');
+        }
+
+        function openEditExerciseModal(exIndex) {
+            const ex = workoutRoutine[currentDayIndex].exercises[exIndex];
+            document.getElementById('editExerciseId').value = exIndex;
+            document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-pen text-brand-400"></i> Chỉnh Sửa Bài Tập';
+
+            document.getElementById('inputExName').value = ex.name;
+            document.getElementById('inputExCategory').value = ex.category || 'Ngực';
+            document.getElementById('inputExSets').value = ex.setsState.length;
+            document.getElementById('inputExWeight').value = ex.setsState[0]?.weight || '';
+            document.getElementById('inputExReps').value = ex.setsState[0]?.reps || '';
+            document.getElementById('inputExNote').value = ex.note || '';
+
+            document.getElementById('exerciseModal').classList.remove('hidden');
+        }
+
+        function closeExerciseModal() {
+            document.getElementById('exerciseModal').classList.add('hidden');
+        }
+
+        // Save Exercise Form Submit Handler
+        function handleSaveExercise(event) {
+            event.preventDefault();
+
+            const editIdx = document.getElementById('editExerciseId').value;
+            const name = document.getElementById('inputExName').value.trim();
+            const category = document.getElementById('inputExCategory').value;
+            const setsCount = parseInt(document.getElementById('inputExSets').value) || 4;
+            const weight = parseFloat(document.getElementById('inputExWeight').value) || 0;
+            const reps = parseInt(document.getElementById('inputExReps').value) || 10;
+            const note = document.getElementById('inputExNote').value.trim();
+
+            if (!name) return;
+
+            if (editIdx !== '') {
+                // Editing existing exercise
+                const idx = parseInt(editIdx);
+                const ex = workoutRoutine[currentDayIndex].exercises[idx];
+                ex.name = name;
+                ex.category = category;
+                ex.note = note;
+
+                // Adjust sets array if setsCount changed
+                if (ex.setsState.length !== setsCount) {
+                    if (setsCount > ex.setsState.length) {
+                        for (let i = ex.setsState.length; i < setsCount; i++) {
+                            ex.setsState.push({ weight, reps, completed: false });
+                        }
+                    } else {
+                        ex.setsState = ex.setsState.slice(0, setsCount);
+                    }
+                }
+                ex.setsCount = setsCount;
+            } else {
+                // Creating new exercise
+                const newEx = {
+                    id: 'ex_' + Date.now(),
+                    name: name,
+                    category: category,
+                    setsCount: setsCount,
+                    defaultWeight: weight,
+                    defaultReps: reps,
+                    note: note,
+                    setsState: Array.from({ length: setsCount }, () => ({
+                        weight: weight,
+                        reps: reps,
+                        completed: false
+                    }))
+                };
+                workoutRoutine[currentDayIndex].exercises.push(newEx);
+            }
+
+            saveRoutineToStorage();
+            closeExerciseModal();
+            renderCurrentDayContent();
+            renderDayTabs();
+        }
+
+        // Reset completion status for current day
+        function resetCurrentDay() {
+            if (confirm('Đặt lại tất cả các dấu tích hoàn thành cho buổi tập hôm nay?')) {
+                workoutRoutine[currentDayIndex].exercises.forEach(ex => {
+                    ex.setsState.forEach(s => s.completed = false);
+                });
+                saveRoutineToStorage();
+                renderCurrentDayContent();
+                renderDayTabs();
+            }
+        }
+
+        // Load Default Template for current day
+        function loadDefaultTemplateConfirm() {
+            if (confirm('Tải bài tập mặc định gợi ý cho buổi này? Các bài tập tự thiết lập trước đó sẽ được thay thế.')) {
+                workoutRoutine[currentDayIndex] = JSON.parse(JSON.stringify(DEFAULT_ROUTINE[currentDayIndex]));
+                saveRoutineToStorage();
+                renderCurrentDayContent();
+                renderDayTabs();
+            }
+        }
+
+        // Rest Timer System
+        function updateTimerDisplay() {
+            const mins = Math.floor(timerSeconds / 60);
+            const secs = timerSeconds % 60;
+            document.getElementById('timerDisplay').innerText =
+                `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function toggleTimer() {
+            if (isTimerRunning) {
+                pauseTimer();
+            } else {
+                startTimer();
+            }
+        }
+
+        function startTimer() {
+            if (timerSeconds <= 0) timerSeconds = timerTotalSeconds;
+            isTimerRunning = true;
+            document.getElementById('timerToggleIcon').className = 'fa-solid fa-pause';
+
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timerSeconds--;
+                updateTimerDisplay();
+
+                if (timerSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    isTimerRunning = false;
+                    document.getElementById('timerToggleIcon').className = 'fa-solid fa-play';
+                    playTimerAlarm();
+                }
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            isTimerRunning = false;
+            clearInterval(timerInterval);
+            document.getElementById('timerToggleIcon').className = 'fa-solid fa-play';
+        }
+
+        function resetTimer() {
+            pauseTimer();
+            timerSeconds = timerTotalSeconds;
+            updateTimerDisplay();
+        }
+
+        function startRestTimerAuto() {
+            timerSeconds = timerTotalSeconds;
+            updateTimerDisplay();
+            startTimer();
+        }
+
+        function setRestTimer(seconds) {
+            timerTotalSeconds = seconds;
+            timerSeconds = seconds;
+            updateTimerDisplay();
+            closeTimerModal();
+            startTimer();
+        }
+
+        function openTimerQuickSelect() {
+            document.getElementById('timerModal').classList.remove('hidden');
+        }
+
+        function closeTimerModal() {
+            document.getElementById('timerModal').classList.add('hidden');
+        }
+
+        // Web Audio API Sound Generator (No external audio files required)
+        let audioCtx = null;
+        function setupAudioContext() {
+            try {
+                window.AudioContext = window.AudioContext || window.webkitAudioContext;
+            } catch (e) { }
+        }
+
+        function playBeepSound() {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5 note
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.2);
+            } catch (e) { }
+        }
+
+        function playTimerAlarm() {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const now = audioCtx.currentTime;
+
+                [0, 0.2, 0.4].forEach(delay => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(880, now + delay); // A5 note
+                    gain.gain.setValueAtTime(0.2, now + delay);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.15);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now + delay);
+                    osc.stop(now + delay + 0.15);
+                });
+            } catch (e) { }
+        }
+
+        // 1RM Calculation (Brzycki Formula)
+        function openOneRmModal() {
+            document.getElementById('oneRmModal').classList.remove('hidden');
+            calculateOneRm();
+        }
+
+        function closeOneRmModal() {
+            document.getElementById('oneRmModal').classList.add('hidden');
+        }
+
+        function calculateOneRm() {
+            const weight = parseFloat(document.getElementById('rmWeight').value) || 0;
+            const reps = parseInt(document.getElementById('rmReps').value) || 0;
+
+            if (weight > 0 && reps > 0) {
+                let oneRm = 0;
+                if (reps === 1) {
+                    oneRm = weight;
+                } else {
+                    oneRm = weight * (36 / (37 - reps));
+                }
+                const rmVal = Math.round(oneRm * 10) / 10;
+                document.getElementById('rmResult').innerText = `${rmVal} Kg`;
+                document.getElementById('rm95').innerText = `${Math.round(rmVal * 0.95 * 10) / 10} kg`;
+                document.getElementById('rm85').innerText = `${Math.round(rmVal * 0.85 * 10) / 10} kg`;
+                document.getElementById('rm70').innerText = `${Math.round(rmVal * 0.70 * 10) / 10} kg`;
+            } else {
+                document.getElementById('rmResult').innerText = '0 Kg';
+                document.getElementById('rm95').innerText = '0 kg';
+                document.getElementById('rm85').innerText = '0 kg';
+                document.getElementById('rm70').innerText = '0 kg';
+            }
+        }
+
+        // Settings Modal
+        function openSettingsModal() {
+            document.getElementById('settingsModal').classList.remove('hidden');
+        }
+
+        function closeSettingsModal() {
+            document.getElementById('settingsModal').classList.add('hidden');
+        }
+
+        function resetAllToDefault() {
+            if (confirm('Khôi phục toàn bộ lịch 5 buổi tập mặc định ban đầu?')) {
+                workoutRoutine = JSON.parse(JSON.stringify(DEFAULT_ROUTINE));
+                saveRoutineToStorage();
+                closeSettingsModal();
+                renderDayTabs();
+                renderCurrentDayContent();
+            }
+        }
+
+        function clearAllData() {
+            if (confirm('CẢNH BÁO: Hành động này sẽ xóa toàn bộ bài tập và dữ liệu đã lưu!')) {
+                localStorage.removeItem(STORAGE_KEY);
+                workoutRoutine = JSON.parse(JSON.stringify(DEFAULT_ROUTINE));
+                saveRoutineToStorage();
+                closeSettingsModal();
+                renderDayTabs();
+                renderCurrentDayContent();
+            }
+        }
+    </script>
+</body>
+
+</html>
